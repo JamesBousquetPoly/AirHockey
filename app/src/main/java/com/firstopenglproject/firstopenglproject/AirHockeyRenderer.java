@@ -4,6 +4,7 @@ import android.content.Context;
 import android.opengl.GLSurfaceView.Renderer;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -36,16 +37,20 @@ public class AirHockeyRenderer implements Renderer {
 
     public AirHockeyRenderer(Context context){
         this.context = context;
-        float[] tableVertices = {
-                0f, 0f,
-                0f, 14f,
-                9f, 14f,
-                9f, 0f
-        };
 
         float[] tableVerticesWithTriangles = {
+                // Triangle 2.1
+                -0.6f, -0.55f,
+                0.6f, 0.55f,
+                -0.6f, 0.55f,
+
+                // Triangle 2.2
+                -0.6f, -0.55f,
+                0.6f, -0.55f,
+                0.6f, 0.55f,
+
                 // Triangle 1
-                -0.5f, 0.5f,
+                -0.5f, -0.5f,
                 0.5f, 0.5f,
                 -0.5f, 0.5f,
 
@@ -53,17 +58,21 @@ public class AirHockeyRenderer implements Renderer {
                 -0.5f, -0.5f,
                 0.5f, -0.5f,
                 0.5f, 0.5f,
+
                 // Line 1
                 -0.5f, 0f,
                 0.5f, 0f,
 
                 // Mallets
                 0f, -0.25f,
-                0f, 0.25f
+                0f, 0.25f,
+
+                // Puck
+                0f, 0f
 
         };
 
-        vertexData = ByteBuffer.allocateDirect(tableVerticesWithTriangles.length * BYTES_PER_FLOAT).asFloatBuffer();
+        vertexData = ByteBuffer.allocateDirect(tableVerticesWithTriangles.length * BYTES_PER_FLOAT).order(ByteOrder.nativeOrder()).asFloatBuffer();
         vertexData.put(tableVerticesWithTriangles);
     }
 
@@ -96,13 +105,17 @@ public class AirHockeyRenderer implements Renderer {
     @Override
     public void onDrawFrame(GL10 glUnused){
         glClear(GL_COLOR_BUFFER_BIT);
-        glUniform4f(uColorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
+        glUniform4f(uColorLocation, 0.0f, 0.75f, 0.25f, 1.0f);
         glDrawArrays(GL_TRIANGLES,0,6);
+        glUniform4f(uColorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
+        glDrawArrays(GL_TRIANGLES,6,6);
         glUniform4f(uColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
-        glDrawArrays(GL_LINES, 6, 2);
+        glDrawArrays(GL_LINES, 12, 2);
         glUniform4f(uColorLocation, 0.0f, 0.0f, 1.0f, 1.0f);
-        glDrawArrays(GL_POINTS, 8, 1);
+        glDrawArrays(GL_POINTS, 14, 1);
         glUniform4f(uColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
-        glDrawArrays(GL_POINTS, 9, 1);
+        glDrawArrays(GL_POINTS, 15, 1);
+        glUniform4f(uColorLocation, 0.0f, 0.0f, 0.0f, 1.0f);
+        glDrawArrays(GL_POINTS, 16, 1);
     }
 }

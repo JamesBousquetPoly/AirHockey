@@ -66,7 +66,7 @@ public class ShaderHelper {
      glGetProgramiv(programObjectId, GL_LINK_STATUS, linkStatus, 0);
 
      if(LoggerConfig.ON){
-         Log.v(TAG, "Results of linking program:\n" + glGetShaderInfoLog(programObjectId));
+         Log.v(TAG, "Results of linking program: " + linkStatus[0] + "\n" + glGetShaderInfoLog(programObjectId));
      }
 
      if(linkStatus[0] == 0){
