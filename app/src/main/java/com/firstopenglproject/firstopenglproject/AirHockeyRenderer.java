@@ -36,6 +36,10 @@ public class AirHockeyRenderer implements Renderer {
     private static final int COLOR_COMPONENT_COUNT = 3;
     private static final int STRIDE = (POSITION_COMPONENT_COUNT + COLOR_COMPONENT_COUNT) * BYTES_PER_FLOAT;
 
+    private static final String U_MATRIX = "u_Matrix";
+    private final float[] projectionMatrix = new float[16];
+    private int uMatrixLocation;
+
     private int aColorLocation;
 
 
@@ -45,22 +49,22 @@ public class AirHockeyRenderer implements Renderer {
         float[] tableVerticesWithTriangles = {
                 // Order of Coordinates: X, Y, R, G, B
                 // Triangle 2.1
-                -0.6f, -0.55f, 0.0f, 0.75f, 0.25f,
-                0.6f, 0.55f, 0.0f, 0.75f, 0.25f,
-                -0.6f, 0.55f, 0.0f, 0.75f, 0.25f,
+                -0.53f, -0.82f, 0.0f, 0.75f, 0.25f,
+                0.53f, 0.82f, 0.0f, 0.75f, 0.25f,
+                -0.53f, 0.82f, 0.0f, 0.75f, 0.25f,
 
                 // Triangle 2.2
-                -0.6f, -0.55f,  0.0f, 0.75f, 0.25f,
-                0.6f, -0.55f,  0.0f, 0.75f, 0.25f,
-                0.6f, 0.55f,  0.0f, 0.75f, 0.25f,
+                -0.53f, -0.82f,  0.0f, 0.75f, 0.25f,
+                0.53f, -0.82f,  0.0f, 0.75f, 0.25f,
+                0.53f, 0.82f,  0.0f, 0.75f, 0.25f,
 
                 // Triangle Fan
                 0f, 0f, 1f, 1f, 1f,
-                -0.5f, -0.5f, 0.7f, 0.7f, 0.7f,
-                0.5f, -0.5f, 0.7f, 0.7f, 0.7f,
-                0.5f, 0.5f, 0.7f, 0.7f, 0.7f,
-                -0.5f, 0.5f, 0.7f, 0.7f, 0.7f,
-                -0.5f, -0.5f, 0.7f, 0.7f, 0.7f,
+                -0.5f, -0.8f, 0.7f, 0.7f, 0.7f,
+                0.5f, -0.8f, 0.7f, 0.7f, 0.7f,
+                0.5f, 0.8f, 0.7f, 0.7f, 0.7f,
+                -0.5f, 0.8f, 0.7f, 0.7f, 0.7f,
+                -0.5f, -0.8f, 0.7f, 0.7f, 0.7f,
 
 
                 // Line 1
@@ -103,16 +107,26 @@ public class AirHockeyRenderer implements Renderer {
 
         glEnableVertexAttribArray(aColorLocation);
 
+        uMatrixLocation = glGetUniformLocation(program,U_MATRIX);
+
     }
 
     @Override
     public void onSurfaceChanged(GL10 glUnused, int width, int height){
         glViewport(0,0,width,height);
+
+        final float aspectRatio = width > height ? (float) width / (float) height : (float) height / (float) width;
+        if(width > height){
+            orthoM(projectionMatrix, 0, -aspectRatio, aspectRatio, -1f, 1f, -1f, 1f);
+        } else {
+            orthoM(projectionMatrix, 0, -1f, 1f, -aspectRatio, aspectRatio, -1f, 1f);
+        }
     }
 
     @Override
     public void onDrawFrame(GL10 glUnused){
         glClear(GL_COLOR_BUFFER_BIT);
+        glUniformMatrix4fv(uMatrixLocation, 1, false, projectionMatrix, 0);
         glDrawArrays(GL_TRIANGLES,0,6);
         glDrawArrays(GL_TRIANGLE_FAN,6,6);
         glDrawArrays(GL_LINES, 12, 2);
