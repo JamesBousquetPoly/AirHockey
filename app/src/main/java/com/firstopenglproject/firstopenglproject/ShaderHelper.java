@@ -12,6 +12,7 @@ import static android.opengl.Matrix.*;
 public class ShaderHelper {
     private static final String TAG = "ShaderHelper";
 
+
     public static int compileVertexShader(String shaderCode){
         return compileShader(GL_VERTEX_SHADER, shaderCode);
     }
@@ -87,6 +88,22 @@ public class ShaderHelper {
         Log.v(TAG, "Results of validating program: " + validateStatus[0] + "\nLog:" + glGetShaderInfoLog(programObjectId));
 
         return validateStatus[0] != 0;
+    }
+
+    public static int buildProgram(String vertexShaderSource, String fragmentShaderSource){
+        int program
+
+        // Compile the shaders
+        int vertexShader = compileVertexShader(vertexShaderSource);
+        int fragmentShader = compileFragmentShader(fragmentShaderSource);
+
+        // Link them into a shader program.
+        program = linkProgram(vertexShader, fragmentShader);
+
+        if (LoggerConfig.ON){
+            validateProgram(program);
+        }
+        return program;
     }
 
 }

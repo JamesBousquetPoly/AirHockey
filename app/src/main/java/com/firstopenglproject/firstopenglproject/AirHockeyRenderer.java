@@ -65,7 +65,7 @@ public class AirHockeyRenderer implements Renderer {
                 -0.5f, 0f, 0f, 1.5f, 1f, 0f, 0f,
                 0.5f, 0f, 0f, 1.5f, 0f, 0f, 1f,
 
-                // Mallets
+                // Mallet
                 0f, -0.4f, 0f, 1.25f, 0f, 0f, 1f,
                 0f, 0.4f, 0f, 1.75f, 1f, 0f, 0f,
 

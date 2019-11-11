@@ -7,7 +7,7 @@ import android.content.pm.ConfigurationInfo;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 
-public class AirHockeyActivity extends Activity {
+public class  AirHockeyActivity extends Activity {
 
     private GLSurfaceView glSurfaceView;
     private boolean rendererSet = false;
