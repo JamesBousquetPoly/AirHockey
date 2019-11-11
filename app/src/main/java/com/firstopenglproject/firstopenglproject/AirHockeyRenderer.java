@@ -22,7 +22,7 @@ import static android.opengl.Matrix.*;
 
 public class AirHockeyRenderer implements Renderer {
 
-    private static final int POSITION_COMPONENT_COUNT = 2;
+    private static final int POSITION_COMPONENT_COUNT = 4;
     private static final int BYTES_PER_FLOAT = 4;
     private final FloatBuffer vertexData;
     private final Context context;
@@ -42,41 +42,35 @@ public class AirHockeyRenderer implements Renderer {
 
     private int aColorLocation;
 
+    private final float[] modelMatrix = new float[16];
+
+
 
     public AirHockeyRenderer(Context context){
         this.context = context;
 
         float[] tableVerticesWithTriangles = {
-                // Order of Coordinates: X, Y, R, G, B
-                // Triangle 2.1
-                -0.53f, -0.82f, 0.0f, 0.75f, 0.25f,
-                0.53f, 0.82f, 0.0f, 0.75f, 0.25f,
-                -0.53f, 0.82f, 0.0f, 0.75f, 0.25f,
-
-                // Triangle 2.2
-                -0.53f, -0.82f,  0.0f, 0.75f, 0.25f,
-                0.53f, -0.82f,  0.0f, 0.75f, 0.25f,
-                0.53f, 0.82f,  0.0f, 0.75f, 0.25f,
+                // Order of Coordinates: X, Y, Z, W, R, G, B
 
                 // Triangle Fan
-                0f, 0f, 1f, 1f, 1f,
-                -0.5f, -0.8f, 0.7f, 0.7f, 0.7f,
-                0.5f, -0.8f, 0.7f, 0.7f, 0.7f,
-                0.5f, 0.8f, 0.7f, 0.7f, 0.7f,
-                -0.5f, 0.8f, 0.7f, 0.7f, 0.7f,
-                -0.5f, -0.8f, 0.7f, 0.7f, 0.7f,
+                0f, 0f, 0f, 1.5f, 1f, 1f, 1f,
+                -0.5f, -0.8f, 0f, 1f, 0.7f, 0.7f, 0.7f,
+                0.5f, -0.8f, 0f, 1f, 0.7f, 0.7f, 0.7f,
+                0.5f, 0.8f, 0f, 2f, 0.7f, 0.7f, 0.7f,
+                -0.5f, 0.8f, 0f, 2f, 0.7f, 0.7f, 0.7f,
+                -0.5f, -0.8f, 0f, 1f, 0.7f, 0.7f, 0.7f,
 
 
                 // Line 1
-                -0.5f, 0f, 1f, 0f, 0f,
-                0.5f, 0f, 0f, 0f, 1f,
+                -0.5f, 0f, 0f, 1.5f, 1f, 0f, 0f,
+                0.5f, 0f, 0f, 1.5f, 0f, 0f, 1f,
 
                 // Mallets
-                0f, -0.25f, 0f, 0f, 1f,
-                0f, 0.25f, 1f, 0f, 0f,
+                0f, -0.4f, 0f, 1.25f, 0f, 0f, 1f,
+                0f, 0.4f, 0f, 1.75f, 1f, 0f, 0f,
 
                 // Puck
-                0f, 0f, 0f, 0f, 0f
+                0f, 0f, 0f, 1.5f, 0f, 0f, 0f
 
         };
 
@@ -114,24 +108,24 @@ public class AirHockeyRenderer implements Renderer {
     @Override
     public void onSurfaceChanged(GL10 glUnused, int width, int height){
         glViewport(0,0,width,height);
-
-        final float aspectRatio = width > height ? (float) width / (float) height : (float) height / (float) width;
-        if(width > height){
-            orthoM(projectionMatrix, 0, -aspectRatio, aspectRatio, -1f, 1f, -1f, 1f);
-        } else {
-            orthoM(projectionMatrix, 0, -1f, 1f, -aspectRatio, aspectRatio, -1f, 1f);
-        }
+        MatrixHelper.perspectiveM(projectionMatrix, 45, (float) width/(float) height, 1f, 10f);
+        setIdentityM(modelMatrix,0);
+        translateM(modelMatrix,0,0f,0f,-2f);
+        final float[] temp = new float[16];
+        multiplyMM(temp, 0, projectionMatrix, 0, modelMatrix, 0);
+        System.arraycopy(temp, 0, projectionMatrix, 0, temp.length);
+        translateM(modelMatrix, 0,0f,0f,-2.5f);
+        rotateM(modelMatrix, 0, -60f, 1f, 0f, 0f);
     }
 
     @Override
     public void onDrawFrame(GL10 glUnused){
         glClear(GL_COLOR_BUFFER_BIT);
         glUniformMatrix4fv(uMatrixLocation, 1, false, projectionMatrix, 0);
-        glDrawArrays(GL_TRIANGLES,0,6);
-        glDrawArrays(GL_TRIANGLE_FAN,6,6);
-        glDrawArrays(GL_LINES, 12, 2);
-        glDrawArrays(GL_POINTS, 14, 1);
-        glDrawArrays(GL_POINTS, 15, 1);
-        glDrawArrays(GL_POINTS, 16, 1);
+        glDrawArrays(GL_TRIANGLE_FAN,0,6);
+        glDrawArrays(GL_LINES, 6, 2);
+        glDrawArrays(GL_POINTS, 8, 1);
+        glDrawArrays(GL_POINTS, 9, 1);
+        glDrawArrays(GL_POINTS, 10, 1);
     }
 }
